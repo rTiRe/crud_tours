@@ -47,6 +47,4 @@ create table if not exists tour_data.tour_to_city
 	primary key (tour_id, city_id)
 );
 
-select * from tour_data.tour_to_city;
-
 -- migrate:down
