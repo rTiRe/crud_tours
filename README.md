@@ -9,6 +9,11 @@ docker run -d \
 postgres:15.5
 ```
 
+### docker build
+```
+docker build . -t crud:0.0.1
+```
+
 ### migrations up
 ```
 docker run --rm --add-host=host.docker.internal:host-gateway --network=host -v "$(pwd)/migrations:/db/migrations" ghcr.io/amacneil/dbmate:2.12 -u "postgres://tour_admin:1234567890@host.docker.internal:38746/tours_db?sslmode=disable" up
