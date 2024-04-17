@@ -31,7 +31,7 @@ def _check_fields(json: dict, fields: dict[str, int]) -> tuple[str, int] | None:
         return f'{json} не содержит все необходимые поля: {fields_names}', http_codes.BAD_REQUEST
     for field, length in fields.items():
         field_val = json.get(field, None)
-        if length != 0 and len(field_val) > length:
+        if length > 0 and len(field_val) > length:
             return (
                 f'Длина {field} в {json} не может быть больше {length} символов!',
                 http_codes.BAD_REQUEST,
@@ -124,7 +124,12 @@ def create_tour() -> tuple[str, int]:
         cities_ids,
         tour_id
     )
-    return tour_id
+    return tour_id, http_codes.OK
+
+
+@app.post('tours/update')
+def update_tour() -> tuple[str, int]:
+    pass
 
 
 if __name__ == '__main__':
