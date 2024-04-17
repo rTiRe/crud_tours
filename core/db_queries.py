@@ -33,3 +33,27 @@ select twa.id, name, description, agencies, cities
 from tours_with_agencies twa
 join tours_with_cities twc on twa.id = twc.id;
 """
+GET_TOUR = """select id from tour_data.tour
+where name={name} and description={description};"""
+GET_AGENCY = """select id from tour_data.agency
+where name={name} and address={address} and phone_number={phone_number};
+"""
+GET_CITY = """select id from tour_data.city
+where name={name} and country={country};
+"""
+INSERT_TOUR = """insert into tour_data.tour 
+(name, description) 
+values 
+({name}, {description})
+returning id;
+"""
+INSERT_AGENCY_TO_TOUR = """insert into tour_data.agency_to_tour 
+(agency_id, tour_id) 
+values 
+({agency_id}, {tour_id});
+"""
+INSERT_TOUR_TO_CITY = """insert into tour_data.tour_to_city 
+(tour_id, city_id) 
+values 
+({tour_id}, {city_id});
+"""
