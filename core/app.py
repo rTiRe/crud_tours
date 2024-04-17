@@ -25,18 +25,18 @@ def get_tours() -> tuple[str, int]:
     return tours, http_codes.OK
 
 
-def _check_fields(json: dict, fields: dict[str, int]) -> tuple[str, int]:
+def _check_fields(json: dict, fields: dict[str, int]) -> tuple[str, int] | None:
     if not set(json.keys()).issubset(fields.keys()):
         fields_names = ', '.join(fields.keys())
         return f'{json} не содержит все необходимые поля: {fields_names}', http_codes.BAD_REQUEST
     for field, length in fields.items():
-        field = json.get(field, None)
-        if length != 0 and len(field) > length:
+        field_val = json.get(field, None)
+        if length != 0 and len(field_val) > length:
             return (
                 f'Длина {field} в {json} не может быть больше {length} символов!',
                 http_codes.BAD_REQUEST,
             )
-        if length != -1 and not field:
+        if length != -1 and not field_val:
             return f'{field} в {json} должно иметь значение!', http_codes.BAD_REQUEST
 
 
@@ -73,7 +73,9 @@ def _insert_fields_to_tour(raw_query: str,
 @app.post('/tours/create')
 def create_tour() -> tuple[str, int]:
     body: dict = request.json
-    _check_fields(body, {'name': 255, 'description': -1, 'agencies': 0, 'cities': 0})
+    check_result = _check_fields(body, {'name': 255, 'description': -1, 'agencies': 0, 'cities': 0})
+    if check_result:
+        return check_result
     name = body['name']
     description = body.get('description', None)
     query = SQL(db_queries.GET_TOUR).format(name=Literal(name), description=Literal(description))
@@ -84,7 +86,9 @@ def create_tour() -> tuple[str, int]:
     agencies_ids = []
     cities_ids = []
     for agency in agencies:
-        _check_fields(agency, {'name': 255, 'address': 512, 'phone_number': 12})
+        check_result = _check_fields(agency, {'name': 255, 'address': 512, 'phone_number': 12})
+        if check_result:
+            return check_result
         query = SQL(db_queries.GET_AGENCY).format(
             name=Literal(agency['name']),
             address=Literal(agency['address']),
@@ -94,12 +98,14 @@ def create_tour() -> tuple[str, int]:
         if append_status:
             return append_status
     for city in cities:
-        _check_fields(city, {'name': 255, 'country': 255})
+        check_result = _check_fields(city, {'name': 255, 'country': 255})
+        if check_result:
+            return check_result
         query = SQL(db_queries.GET_CITY).format(
             name=Literal(city['name']),
             country=Literal(city['country'])
         )
-        append_status = _append_field_id(agency, query, cities_ids)
+        append_status = _append_field_id(city, query, cities_ids)
         if append_status:
             return append_status
     tour = SQL(db_queries.INSERT_TOUR).format(name=Literal(name), description=Literal(description))
