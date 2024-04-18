@@ -2,7 +2,7 @@
 
 create extension if not exists "uuid-ossp";
 
-create schema tour_data;
+create schema if not exists tour_data;
 
 create table if not exists tour_data.agency
 (
@@ -48,3 +48,5 @@ create table if not exists tour_data.tour_to_city
 );
 
 -- migrate:down
+
+drop table if exists tour_data.tour_to_city, tour_data.agency_to_tour, tour_data.city, tour_data.tour, tour_data.agency;
