@@ -75,7 +75,8 @@ def _insert_fields_to_tour(raw_query: str,
             tour_id: str
         ) -> None:
     for field_id in fields_ids:
-        field_dict[list(field_dict.keys())[0]] = Literal(field_id)
+        for key in field_dict.keys():
+            field_dict[key] = Literal(field_id)
         field_to_tour = SQL(raw_query).format(
             **field_dict, 
             tour_id=Literal(tour_id)
