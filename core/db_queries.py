@@ -40,6 +40,12 @@ where id={id};"""
 GET_AGENCY = """select id from tour_data.agency
 where name={name} and address={address} and phone_number={phone_number};
 """
+GET_TOUR_AGENCIES_IDS = """select agency_id from tour_data.agency_to_tour
+where tour_id = {tour_id};
+"""
+GET_TOUR_CITIES_IDS = """select city_id from tour_data.tour_to_city
+where tour_id = {tour_id};
+"""
 GET_CITY = """select id from tour_data.city
 where name={name} and country={country};
 """
@@ -58,4 +64,18 @@ INSERT_TOUR_TO_CITY = """insert into tour_data.tour_to_city
 (tour_id, city_id) 
 values 
 ({tour_id}, {city_id});
+"""
+UPDATE_TOUR = """update tour_data.tour
+set
+name = {name},
+description = {description}
+where id = {id}
+returning id;
+"""
+# Сначала удаляем старые связи, потому что их может стать меньше и к старым мы никак не обратимся
+DELETE_AGENCY_TO_TOUR = """delete from tour_data.agency_to_tour
+where tour_id = {tour_id};
+"""
+DELETE_TOUR_TO_CITY = """delete from tour_data.tour_to_city
+where tour_id = {tour_id}
 """
