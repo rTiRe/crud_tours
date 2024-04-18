@@ -51,7 +51,7 @@ def _get_field_id(query) -> str | bool:
 def _append_field_id(json: dict, query: SQL, fields_ids: list) -> tuple[str, int] | None:
     field_id = _get_field_id(query)
     if not field_id:
-        return f'{json} не существует!', http_codes.BAD_REQUEST
+        return f'{json} не существует!', http_codes.NOT_FOUND
     fields_ids.append(field_id)
 
 
@@ -146,7 +146,7 @@ def create_tour() -> tuple[str, int]:
         cities_ids,
         tour_id
     )
-    return tour_id, http_codes.OK
+    return tour_id, http_codes.CREATED
 
 
 @app.post('/tours/update')
@@ -164,7 +164,7 @@ def update_tour() -> tuple[str, int]:
         return f'Тур {name}: {description} уже существует', http_codes.BAD_REQUEST
     query = SQL(db_queries.GET_TOUR_USING_ID).format(id=Literal(id))
     if not _get_field_id(query):
-        return f'Тур {id} не существует', http_codes.BAD_REQUEST
+        return f'Тур {id} не существует', http_codes.NOT_FOUND
     agencies = body['agencies']
     cities = body['cities']
     agencies_fields = {'name': 255, 'address': 512, 'phone_number': 12}
