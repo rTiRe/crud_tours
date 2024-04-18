@@ -35,6 +35,8 @@ join tours_with_cities twc on twa.id = twc.id;
 """
 GET_TOUR = """select id from tour_data.tour
 where name={name} and description={description};"""
+GET_TOUR_USING_ID = """select id from tour_data.tour
+where id={id};"""
 GET_AGENCY = """select id from tour_data.agency
 where name={name} and address={address} and phone_number={phone_number};
 """

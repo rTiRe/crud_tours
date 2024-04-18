@@ -55,6 +55,20 @@ def _append_field_id(json: dict, query: SQL, fields_ids: list) -> tuple[str, int
     fields_ids.append(field_id)
 
 
+def _get_fields_ids(fields: list[dict], needed_fields: dict[str, int], raw_query: SQL) -> list[str]:
+    fields_ids = []
+    for field in fields:
+        check_result = _check_fields(field, needed_fields)
+        if check_result:
+            return check_result
+        for key in needed_fields.keys():
+            needed_fields[key] = Literal(field[key])
+        query = SQL(raw_query).format(**needed_fields)
+        append_status = _append_field_id(field, query, fields_ids)
+        if append_status:
+            return append_status
+    return fields_ids
+
 def _insert_fields_to_tour(raw_query: str, 
             field_dict: dict[str, Literal], 
             fields_ids: list, 
@@ -83,31 +97,14 @@ def create_tour() -> tuple[str, int]:
         return f'Тур {name}: {description} уже существует', http_codes.BAD_REQUEST
     agencies = body['agencies']
     cities = body['cities']
-    agencies_ids = []
-    cities_ids = []
-    for agency in agencies:
-        check_result = _check_fields(agency, {'name': 255, 'address': 512, 'phone_number': 12})
-        if check_result:
-            return check_result
-        query = SQL(db_queries.GET_AGENCY).format(
-            name=Literal(agency['name']),
-            address=Literal(agency['address']),
-            phone_number=Literal(agency['phone_number'])
-        )
-        append_status = _append_field_id(agency, query, agencies_ids)
-        if append_status:
-            return append_status
-    for city in cities:
-        check_result = _check_fields(city, {'name': 255, 'country': 255})
-        if check_result:
-            return check_result
-        query = SQL(db_queries.GET_CITY).format(
-            name=Literal(city['name']),
-            country=Literal(city['country'])
-        )
-        append_status = _append_field_id(city, query, cities_ids)
-        if append_status:
-            return append_status
+    agencies_fields = {'name': 255, 'address': 512, 'phone_number': 12}
+    agencies_ids = _get_fields_ids(agencies, agencies_fields, db_queries.GET_AGENCY)
+    if isinstance(agencies_ids, tuple):
+        return agencies_ids
+    cities_fields = {'name': 255, 'country': 255}
+    cities_ids = _get_fields_ids(cities, cities_fields, db_queries.GET_CITY)
+    if isinstance(cities_ids, tuple):
+        return cities_ids
     tour = SQL(db_queries.INSERT_TOUR).format(name=Literal(name), description=Literal(description))
     with connection.cursor() as cursor:
         cursor.execute(tour)
@@ -129,7 +126,26 @@ def create_tour() -> tuple[str, int]:
 
 @app.post('tours/update')
 def update_tour() -> tuple[str, int]:
-    pass
+    body = request.json
+    check_result = _check_fields(body, {'id': 36, 'name': 255, 'description': -1, 'agencies': 0, 'cities': 0})
+    if check_result:
+        return check_result
+    id = body['id']
+    name = body['name']
+    description = body.get('description', None)
+    query = SQL(db_queries.GET_TOUR_USING_ID).format(id=Literal(id))
+    if not _get_field_id(query):
+        return f'Тур {id} не существует', http_codes.BAD_REQUEST
+    agencies = body['agencies']
+    cities = body['cities']
+    agencies_fields = {'name': 255, 'address': 512, 'phone_number': 12}
+    agencies_ids = _get_fields_ids(agencies, agencies_fields, db_queries.GET_AGENCY)
+    if isinstance(agencies_ids, tuple):
+        return agencies_ids
+    cities_fields = {'name': 255, 'country': 255}
+    cities_ids = _get_fields_ids(cities, cities_fields, db_queries.GET_CITY)
+    if isinstance(cities_ids, tuple):
+        return cities_ids
 
 
 if __name__ == '__main__':
