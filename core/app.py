@@ -1,7 +1,6 @@
 from flask import Flask, request
 from psycopg2.sql import SQL, Literal
 from psycopg2.extras import RealDictRow
-import uuid
 
 from constants import FLASK_PORT
 import http_codes
@@ -201,7 +200,28 @@ def update_tour() -> tuple[str, int]:
         db_queries.DELETE_TOUR_TO_CITY, db_queries.INSERT_TOUR_TO_CITY,
         {'city_id': None}, tour_id
     )
-    return tour_id, http_codes.OK
+    return tour_id, http_codes.NO_CONTENT
+
+
+@app.delete('/tours/delete')
+def delete_tour() -> tuple[str, int]:
+    body = request.json
+    body_fields = {'id': 36}
+    check_result = _check_fields(body, body_fields)
+    if check_result:
+        return check_result
+    tour_id = body['id']
+    delete_agency = SQL(db_queries.DELETE_AGENCY_TO_TOUR).format(tour_id=Literal(tour_id))
+    delete_city = SQL(db_queries.DELETE_TOUR_TO_CITY).format(tour_id=Literal(tour_id))
+    delete_tour = SQL(db_queries.DELETE_TOUR).format(tour_id=Literal(tour_id))
+    with connection.cursor() as cursor:
+        cursor.execute(delete_agency)
+        cursor.execute(delete_city)
+        cursor.execute(delete_tour)
+        result = cursor.fetchall()
+    if len(result) == 0:
+        return f'{tour_id} не существует!', http_codes.NOT_FOUND
+    return result[0].get('id'), http_codes.NO_CONTENT
 
 
 if __name__ == '__main__':

@@ -77,5 +77,8 @@ DELETE_AGENCY_TO_TOUR = """delete from tour_data.agency_to_tour
 where tour_id = {tour_id};
 """
 DELETE_TOUR_TO_CITY = """delete from tour_data.tour_to_city
-where tour_id = {tour_id}
+where tour_id = {tour_id};
+"""
+DELETE_TOUR = """delete from tour_data.tour
+where id={tour_id} returning id;
 """
