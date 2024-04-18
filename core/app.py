@@ -74,6 +74,8 @@ def _insert_fields_to_tour(raw_query: str,
             fields_ids: list, 
             tour_id: str
         ) -> None:
+    if len(field_dict) != 1:
+        raise ValueError(f'field_dict: {field_dict} должен содеражть только 1 ключ!')
     for field_id in fields_ids:
         for key in field_dict.keys():
             field_dict[key] = Literal(field_id)
