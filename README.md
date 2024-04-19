@@ -1,12 +1,16 @@
 ## Запуск
 
-### 1. Клонирование
+### 1. Установка
+* [Docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script)
+* [Docker Compose](https://docs.docker.com/compose/install/)
+
+### 2. Клонирование
 ```
 git clone https://github.com/rTiRe/crud_tours.git
 cd crud_tours
 ```
 
-### 2. Создание файла окружения
+### 3. Создание файла окружения
 В основной папке присутствует файл-пример `.env.example`.
 Для начала работы его достаточно переименовать в `.env`, но, конечно, желательно поменять значения.
 * `POSTGRES_HOST` - адрес postgres.
@@ -16,21 +20,39 @@ cd crud_tours
 * `POSTGRES_PASSWORD` - пароль postgres
 * `FLASK_PORT` - порт, на котором запущен Flask
 
-> [!POSTGRES_HOST]
+> [!IMPORTANT]
 > `POSTGRES_HOST=host.docker.internal` если запуск будет производиться через `docker compose up`
-> Если запуск будет производиться напрямую, то необходимо указать точный адрес базы данных.
+> Если запуск будет производиться в `dev mode`, то необходимо указать точный адрес базы данных.
 
-### docker build
-```
-docker build . -t crud:0.0.6
-```
+### 4. Управление контейнером
 
-### migrations up
+#### Запуск
 ```
-docker run --rm --add-host=host.docker.internal:host-gateway --network=host -v "$(pwd)/migrations:/db/migrations" ghcr.io/amacneil/dbmate:2.12 -u "postgres://tour_admin:1234567890@host.docker.internal:38746/tours_db?sslmode=disable" up
+docker compose up
 ```
-
-### flask run
+#### Запуск в detach режиме
 ```
-docker run --add-host=host.docker.internal:host-gateway -e PG_HOST=host.docker.internal -e PG_PORT=38746 -e PG_DBNAME=tours_db -e PG_USER=tour_admin -e PG_PASSWORD=1234567890 -e FLASK_PORT=5001 crud:0.0.6
+docker compose up -d
 ```
+#### Запуск с пребилдом
+```
+docker compose up --build
+```
+#### Остановка
+```
+docker compose stop
+```
+#### Остановка + удаление
+```
+docker compose down
+```
+#### Запуск без docker compose (dev mode)
+Для того, чтобы запустить `flask` через консоль или дебаггер, нужно в папке с проектом выполнить следующие команды:
+```
+python3 -m venv venv
+. ./venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
+> [!IMOPORTANT]
+> Необходимо проверить [файл окружения](https://github.com/rTiRe/crud_tours?tab=readme-ov-file#2-%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5-%D1%84%D0%B0%D0%B9%D0%BB%D0%B0-%D0%BE%D0%BA%D1%80%D1%83%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F)
