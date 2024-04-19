@@ -1,13 +1,23 @@
-### create container
+## Запуск
+
+### 1. Клонирование
 ```
-docker run -d \
---name tours \
--e POSTGRES_USER=tour_admin \
--e POSTGRES_PASSWORD=1234567890 \
--e POSTGRES_DB=tours_db \
--p 38746:5432 \
-postgres:15.5
+git clone https://github.com/rTiRe/crud_tours.git
+cd crud_tours
 ```
+
+### 2. Создание файла окружения
+В основной папке присутствует файл-пример `.env.example`.
+Для начала работы его достаточно переименовать в `.env`, но, конечно, желательно поменять значения.
+* `POSTGRES_HOST` - адрес postgres.
+* `POSTGRES_PORT` - порт, на котором запущена БД
+* `POSTGRES_DB` - имя используемой базы данных
+* `POSTGRES_USER` - имя пользователя postgres
+* `POSTGRES_PASSWORD` - пароль postgres
+* `FLASK_PORT` - порт, на котором запущен Flask
+> [!POSTGRES_HOST]
+> `host.docker.internal` если запуск будет производиться через `docker compose up`
+> Если запуск будет производиться напрямую, то необходимо указать точный адрес базы данных.
 
 ### docker build
 ```
