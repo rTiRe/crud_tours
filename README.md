@@ -62,4 +62,4 @@ pip install -r requirements.txt
 python app.py
 ```
 > [!IMPORTANT]
-> Необходимо проверить [файл окружения](https://github.com/rTiRe/crud_tours?tab=readme-ov-file#2-%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5-%D1%84%D0%B0%D0%B9%D0%BB%D0%B0-%D0%BE%D0%BA%D1%80%D1%83%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F)
+> Необходимо проверить [файл окружения](#3.-Создание-файла-окружения)
