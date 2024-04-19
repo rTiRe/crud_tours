@@ -16,7 +16,7 @@ cd crud_tours
 * `POSTGRES_PASSWORD` - пароль postgres
 * `FLASK_PORT` - порт, на котором запущен Flask
 
-> [!NOTE]
+> [!POSTGRES_HOST]
 > `POSTGRES_HOST=host.docker.internal` если запуск будет производиться через `docker compose up`
 > Если запуск будет производиться напрямую, то необходимо указать точный адрес базы данных.
 
