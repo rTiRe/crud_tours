@@ -1,3 +1,7 @@
+## ER-Schema
+
+![er-schema](https://raw.githubusercontent.com/rTiRe/projectname/commit/img.png)
+
 ## Запуск
 
 ### 1. Установка
