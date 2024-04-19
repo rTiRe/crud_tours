@@ -26,7 +26,7 @@ create table if not exists tour_data.city
 (
 	id uuid primary key default uuid_generate_v4(),
 	name varchar(255) not null,
-	country varchar(255),
+	country varchar(255) not null,
 	lat float,
 	lon float,
 	unique(name, country),
