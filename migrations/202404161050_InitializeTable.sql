@@ -7,9 +7,9 @@ create schema if not exists tour_data;
 create table if not exists tour_data.agency
 (
 	id uuid primary key default uuid_generate_v4(),
-	name varchar(255) not null,
-	address varchar(512) not null,
-	phone_number varchar(12) not null,
+	name text not null,
+	address text not null,
+	phone_number text not null,
 	rating float,
 	unique(name, address, phone_number)
 );
@@ -17,7 +17,7 @@ create table if not exists tour_data.agency
 create table if not exists tour_data.tour
 (
 	id uuid primary key default uuid_generate_v4(),
-	name varchar(255) not null,
+	name text not null,
 	description text,
 	unique(name, description)
 );
@@ -25,8 +25,8 @@ create table if not exists tour_data.tour
 create table if not exists tour_data.city
 (
 	id uuid primary key default uuid_generate_v4(),
-	name varchar(255) not null,
-	country varchar(255) not null,
+	name text not null,
+	country text not null,
 	lat float,
 	lon float,
 	unique(name, country),
