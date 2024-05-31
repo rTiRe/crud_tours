@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from psycopg2.sql import SQL, Literal
 from psycopg2.extras import RealDictRow
 
@@ -22,6 +22,61 @@ def get_tours() -> tuple[str, int]:
     with connection.cursor() as cursor:
         cursor.execute(db_queries.GET_TOURS)
         tours = cursor.fetchall()
+    return tours, http_codes.OK
+
+
+
+@app.route('/tour/find_by_agency_rating', methods=['GET'])
+def find_tour_by_rating():
+    query = """
+            SELECT t.name, t.description, a.name AS agency_name, a.rating
+            FROM tour_data.tour t
+            JOIN tour_data.agency_to_tour att ON t.id = att.tour_id
+            JOIN tour_data.agency a ON att.agency_id = a.id
+            WHERE a.rating > %s;
+        """
+    rating = request.args.get('rating', '')
+    if rating:
+        with connection.cursor() as cursor:
+            cursor.execute(query, ('%' + rating + '%',))
+            tours = cursor.fetchall()
+    else:
+        tours = []
+    return jsonify(tours=tours), http_codes.OK
+
+
+@app.route('/tour/find_by_name', methods=['GET'])
+def find_tour_by_name():
+    query = """
+            SELECT json_agg(json_build_object('name', t.name, 'description', t.description)) AS tours
+            FROM tour_data.tour t
+            WHERE t.name ILIKE %s;
+        """
+    tour_name = request.args.get('name', '')
+    if tour_name:
+        with connection.cursor() as cursor:
+            cursor.execute(query, ('%' + tour_name + '%',))
+            result = cursor.fetchall()
+        return jsonify(tours=result or [])
+    return jsonify(tours=[])
+
+
+
+@app.route('/tour/find_by_city', methods=['GET'])
+def find_by_city():
+    query = """
+            SELECT json_agg(json_build_object('name', t.name, 'description', t.description)) AS tours
+            FROM tour_data.tour t
+            JOIN tour_data.tour_to_city ttc ON t.id = ttc.tour_id
+            JOIN tour_data.city c ON c.id = ttc.city_id
+            WHERE c.name ILIKE %s;
+        """
+    city_name = request.args.get('city', '')
+    tours = []
+    if city_name:
+        with connection.cursor() as cursor:
+            cursor.execute(query, ('%' + city_name + '%',))
+            tours = cursor.fetchall()
     return tours, http_codes.OK
 
 
